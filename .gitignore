@@ -1,0 +1,11 @@
+.vscode/
+*.pyc
+/build/
+*~
+.DS_Store
+docs/
+.hypothesis/
+.pytest_cache/
+
+*.swp
+.venv
