@@ -5,7 +5,10 @@ FROM gcr.io/oss-fuzz-base/base-builder-python
 WORKDIR pytorch
 
 RUN python3 -m pip install torch 
-RUN python3 -m pip install atheris hypothesis numpy
+
+RUN python3 -m pip install atheris hypothesis numpy 
+
+#RUN python3 -m pip install sqlalachemy
 
 
 COPY build.sh fuzzer $SRC/
