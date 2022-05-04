@@ -32,7 +32,7 @@
 |API|基础测试|float64模式|多维张量|测试备注|测试依赖|
 |----|:----:|:----:|:----:|----|----|
 |torch\.abs| :white_check_mark: |  ||输入中不包含inf与nan||
-|torch\.acos| :white_check_mark: | | |输入张量非空|
-|torch\.cos| :white_check_mark: | | | 与torch.acos使用相同测试单元|
-|torch.kthvalue|:white_check_mark:||:white_check_mark:|||
+|torch\.acos| :white_check_mark: | | |输入张量非空||
+|torch\.cos| :white_check_mark: | | | 与torch.acos使用相同测试单元||
+|torch.kthvalue|:white_check_mark:||:white_check_mark:|nan被从float中移除||
 

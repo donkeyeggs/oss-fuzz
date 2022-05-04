@@ -3,8 +3,8 @@ import atheris
 import tensor_base as TEST
 import hypothesis.strategies as st
 from hypothesis import given,settings
-with atheris.instrument_imports():
-    import torch
+#with atheris.instrument_imports():
+import torch
 
 #TODO: 尚未测试float64状态下的精度
 FLOATS = st.floats(min_value=-1.0,max_value=1.0,width=32) 

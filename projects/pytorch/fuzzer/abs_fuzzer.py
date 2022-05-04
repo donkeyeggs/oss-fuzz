@@ -3,8 +3,8 @@ import atheris
 import tensor_base as TEST
 import hypothesis.strategies as st
 from hypothesis import given,settings
-with atheris.instrument_imports():
-    import torch
+#with atheris.instrument_imports():
+import torch
 
 Numbers = st.one_of(
     st.floats(allow_infinity=False,allow_nan=False,width=32),
