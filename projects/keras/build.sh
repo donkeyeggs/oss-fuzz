@@ -1,9 +1,4 @@
 #!/bin/bash -eu
-python3 -m pip install  --upgrade pip 
-python3 -m pip install torch-1.11.0-cp38-cp38-manylinux1_x86_64.whl
-python3 -m pip install caffe2
-#python3 -m pip install .
-
 for fuzzer in $(find $SRC -name '*_fuzzer.py'); do
     fuzzer_basename=$(basename -s .py $fuzzer)
     fuzzer_package=${fuzzer_basename}.pkg
