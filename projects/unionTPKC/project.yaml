@@ -1,0 +1,11 @@
+homepage : "https://pytorch.org/"
+language : python
+primary_contact: "liruizhi@tju.edu.cn"
+auto_css:
+ - "null"
+sanitizers:
+ - address
+ - undefined
+fuzzing_engines:
+ - libfuzzer
+main_repo: "https://github.com/pytorch/pytorch"

@@ -1,6 +1,7 @@
 import sys
-import atheris
+
 import tensor_base as TEST
+import platform
 import hypothesis.strategies as st
 from hypothesis import given,settings
 #with atheris.instrument_imports():
@@ -23,8 +24,9 @@ def test_acos(x):
     x = torch.tensor(x)
     assert TEST.equals(torch.cos(torch.acos(x)),x)
 
-fuzz_target = atheris.instrument_func(test_acos.hypothesis.fuzz_one_input)
 
-if __name__ == '__main__':
+if __name__ == '__main__' and platform.system().lower() == "linux":
+    import atheris
+    fuzz_target = atheris.instrument_func(test_acos.hypothesis.fuzz_one_input)
     atheris.Setup(sys.argv,fuzz_target)
     atheris.Fuzz()

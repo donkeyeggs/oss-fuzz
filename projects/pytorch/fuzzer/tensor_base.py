@@ -1,6 +1,8 @@
 import itertools
 import math
 import argparse
+import platform
+
 import numpy as np
 import hypothesis as hyp
 import hypothesis.strategies as st
@@ -34,6 +36,8 @@ if "基础类型":
         return a-b<EPS or b-a<EPS
 
 if "帮助函数":
+    PLATFORM = platform.system().lower()
+
     def self(x):
         return x
     def shape_space(shape):
@@ -66,6 +70,7 @@ if "帮助函数":
             item = get(tensor,index)
             ret.append((list(index),cond(item)))
         return ret
+
     
 
 

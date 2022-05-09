@@ -28,3 +28,5 @@ oss-fuzz没有提供平行测试的工具，我自己采用的是随机生成种
 完善项目，以志愿者将项目发布到google；
 
 尝试写论文开头部分初稿
+
+$$out(N_i, C_{out_j})=bias(C_{out_j})+\sum^{C_{in}-1}_{k=0}weight(C{out_j},k)\bigotimes input(N_i,k)$$
