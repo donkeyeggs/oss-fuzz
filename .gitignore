@@ -6,6 +6,6 @@
 docs/
 .hypothesis/
 .pytest_cache/
-
+.idea/
 *.swp
 .venv

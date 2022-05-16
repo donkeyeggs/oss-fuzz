@@ -1,32 +1,16 @@
 # 本周进展汇报
 
-CAFFE和KERAS的测试簇构建完毕
+重构了一下代码的结构，现在代码在pytorch和tensorflow方面同时使用同一组数据进行对比测试，能够迅速构建许多测试项目；
+caffe和keras仍然使用单独测试；
+目前发现的问题主要是边角问题，主要内容都是精度相关或者api提醒缺失的问题；
+此外在对比测试的过程中发现各个库的参数设计较为不一致，给对比测试带来了一定的麻烦；
 
-本周主要尝试构建的任务主要是tensorflow和pytorch之间的平行对比测试,将相同的测试数据投喂给不同的api观察结果
+目前决定在论文中将对运行速度、参数设计、库细节进行对比；
+尝试写了开头部分的论文，但是思路比较混乱;
 
-oss-fuzz没有提供平行测试的工具，我自己采用的是随机生成种子再分别进行离线测试的方法，每组api只测试了5个种子分别32768组数据，以下是本周测试的项目；
+搁置了发布到google的任务，因为不太确定对比其它google上的整合项目完成到了怎样的程度；
 
-|`Pytorch`|`Tensorflow`|
-|:----:|:----:|
-| | |
-|torch.abs|tf.math.abs|
-|torch.acos|tf.math.acos|
-|torch.cos|tf.math.cos|
-|torch.nn.functional.conv1d|tf.nn.conv1d|
-|torch.nn.functional.conv2d|tf.nn.conv2d|
-|torch.nn.functional.conv3d|tf.nn.conv3d|
-|torch.nn.functional.max_pool2d|torch.nn.max_pool2d|
-|torch.nn.functional.relu|torch.nn.relu|
+# 接下来的任务
 
-
-在单独测试中torch.kthvalue报告了一个关于nan的问题，在确认这个问题是错误还是手册规定
-
-
-# 下周任务
-进行tensorflow,pytorch,keras,keras的对比测试
-
-完善项目，以志愿者将项目发布到google；
-
-尝试写论文开头部分初稿
-
-$$out(N_i, C_{out_j})=bias(C_{out_j})+\sum^{C_{in}-1}_{k=0}weight(C{out_j},k)\bigotimes input(N_i,k)$$
+下周尝试修改，将keras和caffe的高级api部分进行对比测试；
+下周完成论文细纲，画一些需要的图表；
