@@ -24,15 +24,20 @@ def test_tensorflow(_input):
 def assert_equals(_a, _b):
     a = numpy.array(_a)
     b = numpy.array(_b)
-    return numpy.all(a == b)
+    cmp = numpy.all(a == b)
+    if not cmp :
+        TEST.logHead()
+        TEST.log(f"a={a} b={b}")
+        TEST.logEnd()
+    return cmp
 
 # (-inf,-1e-37]U[1e37,inf)
-input_float = st.one_of(
-    TEST.FLOATS(max_float=TEST.toFloat(-1E-37)),
-    TEST.FLOATS(min_float=TEST.toFloat(1E-37)),
-)
-
-@settings(max_examples=10, deadline=10000)
+#input_float = st.one_of(
+#    TEST.FLOATS(max_float=TEST.toFloat(-1E-37)),
+#    TEST.FLOATS(min_float=TEST.toFloat(1E-37)),
+#)
+input_float = TEST.FLOATS()
+@settings(max_examples=10000, deadline=10000)
 @given(_input=TEST.ARRAY_ND(elements=input_float))
 #@example(_input=[1.0000002153053333e-39])
 def test_abs(_input):

@@ -7,7 +7,9 @@ from hypothesis import given, settings, assume, example
 
 import torch
 import tensorflow
-
+'''
+    参数设计问题较大，暂时搁置
+'''
 
 @st.composite
 def input_data(draw):

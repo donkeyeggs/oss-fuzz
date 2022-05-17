@@ -1,6 +1,7 @@
 import itertools
 import math
 import argparse
+import numpy
 import platform
 
 import numpy as np
@@ -14,6 +15,7 @@ if "基本类型":
     INT_INF = 2 ** 31 - 1
     LONG_INF = 2 ** 63 - 1
     FLOAT_INF = 1.7E37
+    FLOAT_INF_64 = 1.7e308
     EPS = 1E-30
     NAN = float('nan')
     INF = float('inf')
@@ -61,6 +63,12 @@ if "基本类型":
     def ARRAY_ND(dtype=np.float32, shape=SHAPE(), elements=FLOATS()):
         return hnp.arrays(dtype=dtype, shape=shape, elements=elements)
 
+    @st.composite
+    def COMPLEX(draw,width=64,allow_nan=True,allow_inf=True):
+        real = draw(FLOATS(width=width,allow_nan=allow_nan,allow_inf=allow_inf))
+        imag = draw(FLOATS(width=width,allow_nan=allow_nan,allow_inf=allow_inf))
+        return np.complex(real=real,imag=imag)
+
 
     def is_same(a, b):
         if np.isnan(a) or np.isnan(b):
@@ -72,16 +80,30 @@ if "基本类型":
 
     def erase_inf(_a, EPS=EPS, INF=INF):
         a = _a
-        a = np.where((a > FLOAT_INF), a, INF)
-        a = np.where((a < -FLOAT_INF), a, -INF)
+        a = np.where(a> FLOAT_INF, a, INF)
+        a = np.where(a< -FLOAT_INF, a, -INF)
         return a
 
+    def erase_compinf(_a):
+        a = _a
+        real = np.real(a)
+        imag = np.imag(a)
+        real = np.where(real> FLOAT_INF_64, real, INF)
+        real = np.where(real < -FLOAT_INF_64, real, -INF)
+        imag = np.where(imag > FLOAT_INF_64, imag, INF)
+        imag = np.where(imag < -FLOAT_INF_64, imag, -INF)
+        return real+imag*(1j)
 
-    def array_same(a, b, EPS=EPS, INF=INF):
+    def array_same(a, b, EPS=EPS, INF=INF,ifcomplex = False):
         if a.shape != b.shape :
             return False
-        a = erase_inf(a)
-        b = erase_inf(b)
+        if not ifcomplex:
+            a = erase_inf(a)
+            b = erase_inf(b)
+        else:
+            a = erase_compinf(a)
+            b = erase_compinf(b)
+
         r1 = (np.isnan(a) & np.isnan(b))
         r2 = (np.isinf(a) & np.isinf(b) & (a == b))
         r3 = (np.isfinite(b) & np.isfinite(b)) & np.isclose(a, b, EPS)
@@ -152,7 +174,7 @@ if __name__ == "__main__":
         a = np.array([[[nan], [inf]], [[nan], [inf]]])
         b = np.array([[[nan], [nan]], [[inf], [inf]]])
         print(array_same(a, b))
-    if 1:
+    if 0:
         import torch
         import tensorflow
 
