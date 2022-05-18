@@ -1,17 +1,20 @@
-import itertools
-import math
+import datetime
 import argparse
-import numpy
 import platform
+import datetime
+import random
+import time
 
 import numpy as np
-import hypothesis as hyp
 import hypothesis.strategies as st
 import hypothesis.extra.numpy as hnp
 from itertools import product
-from hypothesis import given, settings, example
 
-if "基本类型":
+import functions as FUNC
+
+import log as LOG
+
+if "常量":
     INT_INF = 2 ** 31 - 1
     LONG_INF = 2 ** 63 - 1
     FLOAT_INF = 1.7E37
@@ -19,7 +22,9 @@ if "基本类型":
     EPS = 1E-30
     NAN = float('nan')
     INF = float('inf')
+    _INIT_DIR = "D:\learn\code\oss-fuzz\database"
 
+if "基本类型":
 
     def INTEGERS(min_value=-INT_INF, max_value=INT_INF):
         return st.integers(min_value=min_value, max_value=max_value)
@@ -63,11 +68,12 @@ if "基本类型":
     def ARRAY_ND(dtype=np.float32, shape=SHAPE(), elements=FLOATS()):
         return hnp.arrays(dtype=dtype, shape=shape, elements=elements)
 
+
     @st.composite
-    def COMPLEX(draw,width=64,allow_nan=True,allow_inf=True):
-        real = draw(FLOATS(width=width,allow_nan=allow_nan,allow_inf=allow_inf))
-        imag = draw(FLOATS(width=width,allow_nan=allow_nan,allow_inf=allow_inf))
-        return np.complex(real=real,imag=imag)
+    def COMPLEX(draw, width=64, allow_nan=True, allow_inf=True):
+        real = draw(FLOATS(width=width, allow_nan=allow_nan, allow_inf=allow_inf))
+        imag = draw(FLOATS(width=width, allow_nan=allow_nan, allow_inf=allow_inf))
+        return np.complex(real=real, imag=imag)
 
 
     def is_same(a, b):
@@ -80,22 +86,24 @@ if "基本类型":
 
     def erase_inf(_a, EPS=EPS, INF=INF):
         a = _a
-        a = np.where(a> FLOAT_INF, a, INF)
-        a = np.where(a< -FLOAT_INF, a, -INF)
+        a = np.where(a > FLOAT_INF, a, INF)
+        a = np.where(a < -FLOAT_INF, a, -INF)
         return a
+
 
     def erase_compinf(_a):
         a = _a
         real = np.real(a)
         imag = np.imag(a)
-        real = np.where(real> FLOAT_INF_64, real, INF)
+        real = np.where(real > FLOAT_INF_64, real, INF)
         real = np.where(real < -FLOAT_INF_64, real, -INF)
         imag = np.where(imag > FLOAT_INF_64, imag, INF)
         imag = np.where(imag < -FLOAT_INF_64, imag, -INF)
-        return real+imag*(1j)
+        return real + imag * (1j)
 
-    def array_same(a, b, EPS=EPS, INF=INF,ifcomplex = False):
-        if a.shape != b.shape :
+
+    def array_same(a, b, EPS=EPS, INF=INF, ifcomplex=False):
+        if a.shape != b.shape:
             return False
         if not ifcomplex:
             a = erase_inf(a)
@@ -112,52 +120,40 @@ if "基本类型":
 
     def toFloat(x):
         return np.float32(x)
+
 if "帮助函数":
-    def PLATFORM():
-        return platform.system().lower()
+    PLATFORM = FUNC.PLATFORM
 
+    self = FUNC.self
 
-    def self(x):
-        return x
+    shape_space = FUNC.shape_space
 
+    index_except = FUNC.index_except
 
-    def shape_space(shape):
-        return product(*[range(i) for i in shape])
+    index_join = FUNC.index_join
 
+    get = FUNC.get
 
-    def index_except(index, dim):
-        return index[:dim] + index[dim + 1:]
+    trans = FUNC.trans
 
+    new_name = FUNC.new_name
 
-    def index_join(index, dim, i):
-        return index[:dim] + [int(i)] + index[dim:]
-
-
-    def get(array, index):
-        v = array
-        for i in index:
-            v = v[i]
-        return v
-
-
-    def trans(tensor, cond=self):
-        ret = []
-        for index in shape_space(tensor.shape):
-            item = get(tensor, index)
-            ret.append((list(index), cond(item)))
-        return ret
+    now_time = FUNC.now_time
 
 if "日志输出":
+    _cout = LOG.Log(headline="STD >>> ", console=True)
+
+
     def logHead():
-        print("\033[1;34;32m == Logging == \033[0m")
+        _cout.logHead()
 
 
-    def log(*argc, end='\n'):
-        print("\033[1;34;32mDEBUG >>>\033[0m", *argc, end=end)
+    def log(*argc, **argv):
+        _cout.log(*argc, **argv)
 
 
     def logEnd():
-        print()
+        _cout.logEnd()
 
 if "运行参数":
     PARSER = argparse.ArgumentParser("pytorch测试专用参数")
