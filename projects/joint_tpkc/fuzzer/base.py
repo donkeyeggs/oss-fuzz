@@ -117,6 +117,12 @@ if "基本类型":
         r3 = (np.isfinite(b) & np.isfinite(b)) & np.isclose(a, b, EPS)
         return np.all(r1 | r2 | r3)
 
+    def all_same(ary:list,EPS=EPS,INF=INF,ifcomplex=False):
+        for i,it in enumerate(ary[:-1]):
+            for j,jt in enumerate(ary[i+1:]):
+                if not array_same(it,jt,EPS,INF,ifcomplex):
+                    return False
+        return  True
 
     def toFloat(x):
         return np.float32(x)

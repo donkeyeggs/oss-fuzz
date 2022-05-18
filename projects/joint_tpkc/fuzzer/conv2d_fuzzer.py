@@ -5,9 +5,12 @@ import traceback
 import hypothesis.strategies as st
 from hypothesis import given, settings, assume, example
 
+import log as LOG
 import torch
 import tensorflow
+import paddle
 
+cout=LOG.Log("conv2d_fuzzer",log_dir=TEST._INIT_DIR)
 
 def test_torch(_input, _weight, _stride, _padding, _dilation):
     input = torch.tensor(_input)
@@ -41,20 +44,36 @@ def test_tensorflow(_input, _filters, _stride, _padding, _dilations):
     )
     return output
 
+def test_paddle(_input, _filters, _stride, _padding, _dilations):
+    input = paddle.to_tensor(_input)
+    filters = paddle.to_tensor(_filters)
+    stride = _stride
+    padding = _padding
+    dilations = _dilations
+    output = paddle.nn.functional.conv2d(
+        x = input,
+        weight = filters,
+        stride = stride,
+        padding = 'VALID' if padding == 0 else 'SAME',
+        dilation = dilations,
+        data_format="NCHW"
+    )
+    return  output
 
-def assert_equals(_a, _b):
+def assert_equals(_a, _b, _c):
     a = numpy.array(_a)
     b = numpy.array(_b)
+    c = numpy.array(_c)
     # TEST.log("assert_equal ",numpy.shape(a)!=numpy.shape(b))
-    if numpy.any(numpy.shape(a) != numpy.shape(b)):
-        return False
-    ret = TEST.array_same(a, b, EPS=1E-4)
+    ret = TEST.all_same([a, b,c])
     if not ret:
-        TEST.log(f"(a)={a.shape} (b)={b.shape}")
-        TEST.log(f"\na={a} \nb={b}")
+        cout.logHead()
+        cout.log(f"(a)={a.shape} (b)={b.shape} (c)={c.shape}")
+        cout.log(f"\na={a} \nb={b} \n c={c}")
+        cout.log_empty()
+        cout.logEnd()
         pass
     return ret
-
 
 @st.composite
 def input_data(draw):
@@ -91,12 +110,12 @@ def input_data(draw):
     )
     input_shape = (batch, in_channels, H_input_len,W_input_len)
     input = draw(
-        TEST.ARRAY_ND(shape=input_shape, elements=TEST.FLOATS(max_float=inf, min_float=-inf))
+        TEST.ARRAY_ND(shape=input_shape, elements=TEST.FLOATS())
     )
 
     weight_shape = (out_channels, in_channels, H_weight_len,W_weight_len)
     weight = draw(
-        TEST.ARRAY_ND(shape=weight_shape, elements=TEST.FLOATS(max_float=inf, min_float=-inf))
+        TEST.ARRAY_ND(shape=weight_shape, elements=TEST.FLOATS())
     )
 
     stride = draw(
@@ -108,13 +127,6 @@ def input_data(draw):
             )
         )
     )
-
-    # padding = draw(
-    #    st.one_of(
-    #        st.just('valid'),
-    #        st.just('same')
-    #    )
-    # )
     padding = 0
     return (input, weight, stride, padding, dilation)
 
@@ -125,17 +137,10 @@ def input_data(draw):
 )
 def test_conv2d(_input):
     (input, weight, stride, padding, dilation) = _input
-    # TEST.log("[input shape]", numpy.shape(input), numpy.shape(weight),
-    #         f"stride = {stride} padding = {padding} dilation = {dilation}")
     torch_output = test_torch(input, weight, stride, padding, dilation)
     tensorflow_output = test_tensorflow(input, weight, stride, padding, dilation)
-    # TEST.log("torch_output := ",torch_output)
-    # TEST.log("tensor_output := ",tensorflow_output)
-    # TEST.log("[output shape]", torch_output.shape, tensorflow_output.shape)
-    assertation = assert_equals(torch_output, tensorflow_output)
-    # TEST.log("torch output =",torch_output)
-    # TEST.log("tensorflow output =",tensorflow_output)
-    # TEST.log("assertation ",assertation)
+    paddle_output = test_paddle(input, weight, stride, padding, dilation)
+    assertation = assert_equals(torch_output, tensorflow_output, paddle_output)
     assert assertation
 
 

@@ -1,13 +1,17 @@
 import sys
 import numpy
-import base as TEST
 import traceback
 import hypothesis.strategies as st
 from hypothesis import given, settings, assume,example
 
+import base as TEST
+import log as LOG
+
 import torch
 import tensorflow
+import paddle
 
+cout = LOG.Log("abs_fuzzer",log_dir=TEST._INIT_DIR)
 
 def test_torch(_input):
     input = torch.tensor(_input)
@@ -20,15 +24,21 @@ def test_tensorflow(_input):
     output = tensorflow.math.abs(input)
     return output
 
+def test_paddle(_input):
+    input = paddle.to_tensor(_input)
+    output = paddle.abs(input)
+    return output
 
-def assert_equals(_a, _b):
+def assert_equals(_a, _b, _c):
     a = numpy.array(_a)
     b = numpy.array(_b)
-    cmp = numpy.all(a == b)
+    c = numpy.array(_c)
+    cmp = TEST.all_same([a,b,c])
     if not cmp :
-        TEST.logHead()
-        TEST.log(f"a={a} b={b}")
-        TEST.logEnd()
+        cout.logHead()
+        cout.log(f"a={a} b={b} c={c}")
+        cout.log_empty()
+        cout.logEnd()
     return cmp
 
 # (-inf,-1e-37]U[1e37,inf)
@@ -39,15 +49,11 @@ def assert_equals(_a, _b):
 input_float = TEST.FLOATS()
 @settings(max_examples=10000, deadline=10000)
 @given(_input=TEST.ARRAY_ND(elements=input_float))
-#@example(_input=[1.0000002153053333e-39])
 def test_abs(_input):
-    #input = numpy.array(_input)
-    #TEST.log(input)
-    #assume(numpy.all(input > 1E-5))
     torch_output = test_torch(_input)
     tensorflow_output = test_tensorflow(_input)
-    assertation = assert_equals(torch_output, tensorflow_output)
-    #TEST.log("assertation", assertation)
+    paddle_output = test_paddle(_input)
+    assertation = assert_equals(torch_output, tensorflow_output, paddle_output)
     assert assertation
 
 
