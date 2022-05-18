@@ -12,3 +12,4 @@ build
 *.swp
 .pytest_cache
 *__pycache__/*
+database/*
