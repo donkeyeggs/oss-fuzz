@@ -24,7 +24,7 @@ def input_data(draw):
 
 def test_torch(_input):
     input = torch.tensor(_input)
-    output = torch.fft.fft(
+    output = torch.fft.ifft(
         input=input
     )
     return output
@@ -32,7 +32,7 @@ def test_torch(_input):
 
 def test_tensorflow(_input):
     input = tensorflow.constant(_input)
-    output = tensorflow.raw_ops.FFT(
+    output = tensorflow.raw_ops.IFFT(
         input=input
     )
     return output
@@ -61,7 +61,6 @@ def test_fft(_input):
     tensorflow_output = test_tensorflow(input)
     assertation = assert_equals(torch_output, tensorflow_output)
     assert assertation
-
 
 
 torch.set_default_dtype(torch.float64)
