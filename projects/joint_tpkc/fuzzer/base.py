@@ -17,7 +17,7 @@ import log as LOG
 if "常量":
     INT_INF = 2 ** 31 - 1
     LONG_INF = 2 ** 63 - 1
-    FLOAT_INF = 1.7E37
+    FLOAT_INF = 1.7e37
     FLOAT_INF_64 = 1.7e308
     EPS = 1E-30
     NAN = float('nan')
@@ -86,8 +86,11 @@ if "基本类型":
 
     def erase_inf(_a, EPS=EPS, INF=INF):
         a = _a
-        a = np.where(a > FLOAT_INF, a, INF)
-        a = np.where(a < -FLOAT_INF, a, -INF)
+        #print(a)
+        a = np.where(a > FLOAT_INF, INF, a)
+        #print(a)
+        a = np.where(a < -FLOAT_INF, -INF, a)
+        #print(a)
         return a
 
 
@@ -95,10 +98,10 @@ if "基本类型":
         a = _a
         real = np.real(a)
         imag = np.imag(a)
-        real = np.where(real > FLOAT_INF_64, real, INF)
-        real = np.where(real < -FLOAT_INF_64, real, -INF)
-        imag = np.where(imag > FLOAT_INF_64, imag, INF)
-        imag = np.where(imag < -FLOAT_INF_64, imag, -INF)
+        real = np.where(real > FLOAT_INF_64, INF, real)
+        real = np.where(real < -FLOAT_INF_64, -INF, -real)
+        imag = np.where(imag > FLOAT_INF_64, INF, imag)
+        imag = np.where(imag < -FLOAT_INF_64, -INF, -imag)
         return real + imag * (1j)
 
 
@@ -108,9 +111,11 @@ if "基本类型":
         if not ifcomplex:
             a = erase_inf(a)
             b = erase_inf(b)
+            pass
         else:
-            a = erase_compinf(a)
-            b = erase_compinf(b)
+            #a = erase_compinf(a)
+            #b = erase_compinf(b)
+            pass
 
         r1 = (np.isnan(a) & np.isnan(b))
         r2 = (np.isinf(a) & np.isinf(b) & (a == b))
@@ -170,12 +175,12 @@ if "暂存测试用例":
     pass
 
 if __name__ == "__main__":
-    if 0:
+    if 1:
         inf = INF
         nan = NAN
-        a = np.array([[[nan], [inf]], [[nan], [inf]]])
-        b = np.array([[[nan], [nan]], [[inf], [inf]]])
-        print(array_same(a, b))
+        a = np.array([38.004])
+        b = np.array([inf])
+        print(array_same(a, b),[a==b])
     if 0:
         import torch
         import tensorflow

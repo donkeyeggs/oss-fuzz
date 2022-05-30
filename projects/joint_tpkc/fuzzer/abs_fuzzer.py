@@ -13,18 +13,18 @@ import paddle
 
 cout = LOG.Log("abs_fuzzer",log_dir=TEST._INIT_DIR)
 
-def test_torch(_input):
+def _test_torch(_input):
     input = torch.tensor(_input)
     output = torch.abs(input)
     return output
 
 
-def test_tensorflow(_input):
+def _test_tensorflow(_input):
     input = tensorflow.constant(_input)
     output = tensorflow.math.abs(input)
     return output
 
-def test_paddle(_input):
+def _test_paddle(_input):
     input = paddle.to_tensor(_input)
     output = paddle.abs(input)
     return output
@@ -41,7 +41,7 @@ def assert_equals(_a, _b, _c):
         cout.logEnd()
     return cmp
 
-# (-inf,-1e-37]U[1e37,inf)
+# (-inf,-1e-37]U[1e-37,inf)
 #input_float = st.one_of(
 #    TEST.FLOATS(max_float=TEST.toFloat(-1E-37)),
 #    TEST.FLOATS(min_float=TEST.toFloat(1E-37)),
@@ -49,22 +49,22 @@ def assert_equals(_a, _b, _c):
 input_float = TEST.FLOATS()
 @settings(max_examples=10000, deadline=10000)
 @given(_input=TEST.ARRAY_ND(elements=input_float))
-def test_abs(_input):
-    torch_output = test_torch(_input)
-    tensorflow_output = test_tensorflow(_input)
-    paddle_output = test_paddle(_input)
+def _test_abs(_input):
+    torch_output = _test_torch(_input)
+    tensorflow_output = _test_tensorflow(_input)
+    paddle_output = _test_paddle(_input)
     assertation = assert_equals(torch_output, tensorflow_output, paddle_output)
     assert assertation
 
 
 TEST.log("running on", TEST.PLATFORM())
 if __name__ == "__main__" and TEST.PLATFORM() == "windows":
-    test_abs()
+    _test_abs()
     pass
 
 if __name__ == "__main__" and TEST.PLATFORM() == "linux":
     import atheris
 
-    fuzz_target = atheris.instrument_func(test_abs.hypothesis.fuzz_one_input)
+    fuzz_target = atheris.instrument_func(_test_abs.hypothesis.fuzz_one_input)
     atheris.Setup(sys.argv, fuzz_target)
     atheris.Fuzz()

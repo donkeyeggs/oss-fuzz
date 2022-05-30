@@ -12,6 +12,9 @@ import paddle
 
 cout=LOG.Log("conv3d_fuzzer",log_dir=TEST._INIT_DIR)
 
+from memory_profiler import profile
+
+@profile
 def test_torch(_input, _weight, _stride, _padding, _dilation):
     input = torch.tensor(_input)
     weight = torch.tensor(_weight)

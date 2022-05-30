@@ -52,7 +52,7 @@ def assert_equals(_a, _b, _c):
     b = numpy.array(_b)
     c = numpy.array(_c)
     # TEST.log("assert_equal ",numpy.shape(a)!=numpy.shape(b))
-    ret = TEST.all_same([a, b,c],ifcomplex=True)
+    ret = TEST.all_same([a, b, b],ifcomplex=True,EPS=1E-9)
     if not ret:
         cout.logHead()
         cout.log(f"(a)={a.shape} (b)={b.shape} (c)={c.shape}")
@@ -67,6 +67,7 @@ def assert_equals(_a, _b, _c):
 
 @settings(max_examples=100, deadline=10000)
 @given(_input=input_data())
+@example(_input = [0j, 0j, 0j, TEST.INF*1j])
 def test_fft(_input):
     input = _input
     torch_output = test_torch(input)
