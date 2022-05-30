@@ -1,6 +1,9 @@
 import sys
-import numpy as np
+import numpy
+import paddle.fft
+
 import base as TEST
+import log as LOG
 import traceback
 import hypothesis.strategies as st
 from hypothesis import given, settings, assume, example
@@ -9,6 +12,8 @@ warnings.filterwarnings("ignore")
 
 import torch
 import tensorflow
+
+cout = LOG.Log("fft_fuzzer",TEST._INIT_DIR)
 
 
 @st.composite
@@ -37,19 +42,26 @@ def test_tensorflow(_input):
     )
     return output
 
+def test_paddle(_input):
+    input = paddle.to_tensor(_input)
+    output = paddle.fft.fft(input)
+    return output
 
-def assert_equals(_a, _b):
-    a = np.array(_a)
-    b = np.array(_b)
-    if a.shape != b.shape:
-        return False
-    #TEST.log("comped")
-    cmp = TEST.array_same(a, b, ifcomplex=True)
-    if not cmp:
-        TEST.logHead()
-        TEST.log(f"a={a} b={b}")
+def assert_equals(_a, _b, _c):
+    a = numpy.array(_a)
+    b = numpy.array(_b)
+    c = numpy.array(_c)
+    # TEST.log("assert_equal ",numpy.shape(a)!=numpy.shape(b))
+    ret = TEST.all_same([a, b,c],ifcomplex=True)
+    if not ret:
+        cout.logHead()
+        cout.log(f"(a)={a.shape} (b)={b.shape} (c)={c.shape}")
+        cout.log(f"\na={a} \nb={b} \n c={c}")
+        cout.log_empty()
+        cout.logEnd()
+        pass
+    return ret
 
-    return cmp
 
 
 
@@ -59,7 +71,8 @@ def test_fft(_input):
     input = _input
     torch_output = test_torch(input)
     tensorflow_output = test_tensorflow(input)
-    assertation = assert_equals(torch_output, tensorflow_output)
+    paddle_output = test_paddle(input)
+    assertation = assert_equals(torch_output, tensorflow_output,paddle_output)
     assert assertation
 
 

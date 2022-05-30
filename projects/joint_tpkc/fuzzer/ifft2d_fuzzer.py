@@ -1,5 +1,7 @@
 import sys
-import numpy as np
+import numpy
+import paddle
+
 import base as TEST
 import traceback
 import hypothesis.strategies as st
@@ -17,8 +19,8 @@ cout = LOG.Log("ifft2d_fuzzer",log_dir=TEST._INIT_DIR)
 def input_data(draw):
     input = draw(
         TEST.ARRAY_ND(
-            dtype=np.complex,
-            shape=TEST.SHAPE(min_dims=2,max_dims=2,min_side=1,max_side=100),
+            dtype=numpy.complex,
+            shape=TEST.SHAPE(min_dims=2,max_dims=2,min_side=1,max_side=80),
             elements=TEST.COMPLEX()
         )
     )
@@ -40,21 +42,27 @@ def test_tensorflow(_input):
     )
     return output
 
+def test_paddle(_input):
+    input = paddle.to_tensor(_input)
+    output = paddle.fft.ifft2(
+        input
+    )
+    return output
 
-def assert_equals(_a, _b):
-    a = np.array(_a)
-    b = np.array(_b)
-    if a.shape != b.shape:
-        return False
-    cmp = TEST.array_same(a, b, ifcomplex=True)
-    if not cmp:
+def assert_equals(_a, _b, _c):
+    a = numpy.array(_a)
+    b = numpy.array(_b)
+    c = numpy.array(_c)
+    # TEST.log("assert_equal ",numpy.shape(a)!=numpy.shape(b))
+    ret = TEST.all_same([a, b, c],ifcomplex=True)
+    if not ret:
         cout.logHead()
-        cout.log(f"a={a} b={b}")
+        cout.log(f"(a)={a.shape} (b)={b.shape} (c)={c.shape}")
+        cout.log(f"\na={a} \nb={b} \n c={c}")
         cout.log_empty()
         cout.logEnd()
-
-    return cmp
-
+        pass
+    return ret
 
 
 @settings(max_examples=100, deadline=10000)
@@ -63,7 +71,8 @@ def test_ifft2d(_input):
     input = _input
     torch_output = test_torch(input)
     tensorflow_output = test_tensorflow(input)
-    assertation = assert_equals(torch_output, tensorflow_output)
+    paddle_output = test_paddle(input)
+    assertation = assert_equals(torch_output, tensorflow_output, paddle_output)
     assert assertation
 
 

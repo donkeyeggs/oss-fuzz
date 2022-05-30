@@ -1,6 +1,9 @@
 import sys
 import numpy
+import paddle
+
 import base as TEST
+import log as LOG
 import traceback
 import hypothesis.strategies as st
 from hypothesis import given, settings, assume, example
@@ -8,6 +11,7 @@ from hypothesis import given, settings, assume, example
 import torch
 import tensorflow
 
+cout=LOG.Log("cos_fuzzer",log_dir=TEST._INIT_DIR)
 
 def test_torch(_input):
     input = torch.tensor(_input)
@@ -20,11 +24,25 @@ def test_tensorflow(_input):
     output = tensorflow.math.cos(input)
     return output
 
+def test_paddle(_input):
+    input = paddle.to_tensor(_input)
+    output = paddle.acos(input)
+    return output
 
-def assert_equals(_a, _b):
+def assert_equals(_a, _b, _c):
     a = numpy.array(_a)
     b = numpy.array(_b)
-    return numpy.all(a == b)
+    c = numpy.array(_c)
+    # TEST.log("assert_equal ",numpy.shape(a)!=numpy.shape(b))
+    ret = TEST.all_same([a, b,c])
+    if not ret:
+        cout.logHead()
+        cout.log(f"(a)={a.shape} (b)={b.shape} (c)={c.shape}")
+        cout.log(f"\na={a} \nb={b} \n c={c}")
+        cout.log_empty()
+        cout.logEnd()
+        pass
+    return ret
 
 
 @settings(max_examples=10, deadline=10000)
@@ -33,10 +51,8 @@ def assert_equals(_a, _b):
 def test_cos(_input):
     torch_output = test_torch(_input)
     tensorflow_output = test_tensorflow(_input)
-    assertation = assert_equals(torch_output, tensorflow_output)
-    #TEST.log("torch output =",torch_output)
-    #TEST.log("tensorflow output =",tensorflow_output)
-    # TEST.log("assertation", assertation)
+    paddle_output = test_paddle(_input)
+    assertation = assert_equals(torch_output, tensorflow_output, paddle_output)
     assert assertation
 
 

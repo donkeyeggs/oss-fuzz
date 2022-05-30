@@ -1,13 +1,16 @@
 import sys
 import numpy
+import paddle
+
 import base as TEST
+import log as LOG
 import traceback
 import hypothesis.strategies as st
 from hypothesis import given, settings, assume, example
 
 import torch
 import tensorflow
-
+cout = LOG.Log('max_pool1d_fuzzer',log_dir=TEST._INIT_DIR)
 @st.composite
 def input_data(draw):
     max_batch = 5
@@ -38,19 +41,20 @@ def input_data(draw):
     return (input,kernel_size,stride,padding)
     pass
 
-def assert_equals(_a,_b):
+def assert_equals(_a, _b, _c):
     a = numpy.array(_a)
     b = numpy.array(_b)
-    if a.shape != b.shape :
-        return False
-    cmp = TEST.array_same(a,b)
-    if not cmp:
-        TEST.logHead()
-        TEST.log(f"cmp:={cmp}")
-        TEST.log(f"\n(shape a)={a.shape}\n(shape b)={b.shape}")
-        TEST.log(f"\na={a}\nb={b}")
-        TEST.logEnd()
-    return cmp
+    c = numpy.array(_c)
+    # TEST.log("assert_equal ",numpy.shape(a)!=numpy.shape(b))
+    ret = TEST.all_same([a, b, c])
+    if not ret:
+        cout.logHead()
+        cout.log(f"(a)={a.shape} (b)={b.shape} (c)={c.shape}")
+        cout.log(f"\na={a} \nb={b} \n c={c}")
+        cout.log_empty()
+        cout.logEnd()
+        pass
+    return ret
 
 def test_torch(_input,_kernel_size,_stride,_padding):
     input = torch.tensor(_input)
@@ -62,6 +66,19 @@ def test_torch(_input,_kernel_size,_stride,_padding):
         kernel_size = kernel_size, 
         stride = stride, 
         padding = padding, 
+    )
+    return output
+
+def test_paddle(_input,_kernel_size,_stride,_padding):
+    input = paddle.to_tensor(_input)
+    kernel_size = _kernel_size
+    stride = _stride
+    padding = _padding
+    output = paddle.nn.functional.max_pool1d(
+        x=input,
+        kernel_size=kernel_size,
+        stride=stride,
+        padding=padding,
     )
     return output
 
@@ -85,7 +102,8 @@ def test_max_pool1d(_input):
     (input,kernel_size,stride,padding) = _input
     torch_output = test_torch(input,kernel_size,stride,padding)
     tensorflow_output = test_tensorflow(input,kernel_size,stride,padding)
-    assertation = assert_equals(torch_output, tensorflow_output)
+    paddle_output = test_paddle(input,kernel_size,stride,padding)
+    assertation = assert_equals(torch_output, tensorflow_output,paddle_output)
     assert assertation
 
 TEST.log("running on", TEST.PLATFORM())
