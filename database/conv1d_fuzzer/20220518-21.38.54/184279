@@ -1,0 +1,101 @@
+(a)=(7, 17, 18) (b)=(7, 17, 18)
+
+a=[[[nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  ...
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]]
+
+ [[nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  ...
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]]
+
+ [[nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  ...
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]]
+
+ ...
+
+ [[nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  ...
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]]
+
+ [[nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  ...
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]]
+
+ [[nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  ...
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]]] 
+b=[[[nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  ...
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]]
+
+ [[nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  ...
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]]
+
+ [[nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  ...
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]]
+
+ ...
+
+ [[nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  ...
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]]
+
+ [[nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  ...
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]]
+
+ [[nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  ...
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]
+  [nan nan nan ... nan nan nan]]]
+
