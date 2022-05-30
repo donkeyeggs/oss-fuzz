@@ -6,6 +6,7 @@ from hypothesis import given, settings, assume,example
 
 import base as TEST
 import log as LOG
+import gather as GATHER
 
 import torch
 import tensorflow
@@ -13,18 +14,18 @@ import paddle
 
 cout = LOG.Log("abs_fuzzer",log_dir=TEST._INIT_DIR)
 
-def _test_torch(_input):
+def test_torch(_input):
     input = torch.tensor(_input)
     output = torch.abs(input)
     return output
 
 
-def _test_tensorflow(_input):
+def test_tensorflow(_input):
     input = tensorflow.constant(_input)
     output = tensorflow.math.abs(input)
     return output
 
-def _test_paddle(_input):
+def test_paddle(_input):
     input = paddle.to_tensor(_input)
     output = paddle.abs(input)
     return output
@@ -50,9 +51,13 @@ input_float = TEST.FLOATS()
 @settings(max_examples=10000, deadline=10000)
 @given(_input=TEST.ARRAY_ND(elements=input_float))
 def _test_abs(_input):
-    torch_output = _test_torch(_input)
-    tensorflow_output = _test_tensorflow(_input)
-    paddle_output = _test_paddle(_input)
+    if 1 and "Gather DATA":
+        GATHER.Gather_Data(cout.PROJECT_NAME,((_input)),test_torch,test_tensorflow,test_paddle)
+        assert True
+        return
+    torch_output = test_torch(_input)
+    tensorflow_output = test_tensorflow(_input)
+    paddle_output = test_paddle(_input)
     assertation = assert_equals(torch_output, tensorflow_output, paddle_output)
     assert assertation
 

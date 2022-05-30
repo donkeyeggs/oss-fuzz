@@ -10,3 +10,4 @@ docs/
 *.swp
 .venv
 __lab/
+database/

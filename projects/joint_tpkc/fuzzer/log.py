@@ -83,6 +83,7 @@ class Log(object):
                  ):
         self.nothing = (FUNC.PLATFORM()=="linux")
         self._project_name = project_name
+        self.PROJECT_NAME = project_name
         self._headline = headline
         self.project_name = Font(f"({project_name})", style=STYLE.BOLD, color=COLOR.PURPLE)
         self.headline = Font(headline, style=STYLE.BOLD, color=COLOR.GREEN)
