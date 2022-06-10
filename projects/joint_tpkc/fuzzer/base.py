@@ -4,6 +4,9 @@ import platform
 import datetime
 import random
 import time
+import os
+
+os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
 import numpy as np
 import hypothesis.strategies as st
@@ -86,11 +89,11 @@ if "基本类型":
 
     def erase_inf(_a, EPS=EPS, INF=INF):
         a = _a
-        #print(a)
+        # print(a)
         a = np.where(a > FLOAT_INF, INF, a)
-        #print(a)
+        # print(a)
         a = np.where(a < -FLOAT_INF, -INF, a)
-        #print(a)
+        # print(a)
         return a
 
 
@@ -113,8 +116,8 @@ if "基本类型":
             b = erase_inf(b)
             pass
         else:
-            #a = erase_compinf(a)
-            #b = erase_compinf(b)
+            # a = erase_compinf(a)
+            # b = erase_compinf(b)
             pass
 
         r1 = (np.isnan(a) & np.isnan(b))
@@ -122,12 +125,14 @@ if "基本类型":
         r3 = (np.isfinite(b) & np.isfinite(b)) & np.isclose(a, b, EPS)
         return np.all(r1 | r2 | r3)
 
-    def all_same(ary:list,EPS=EPS,INF=INF,ifcomplex=False):
-        for i,it in enumerate(ary[:-1]):
-            for j,jt in enumerate(ary[i+1:]):
-                if not array_same(it,jt,EPS,INF,ifcomplex):
+
+    def all_same(ary: list, EPS=EPS, INF=INF, ifcomplex=False):
+        for i, it in enumerate(ary[:-1]):
+            for j, jt in enumerate(ary[i + 1:]):
+                if not array_same(it, jt, EPS, INF, ifcomplex):
                     return False
-        return  True
+        return True
+
 
     def toFloat(x):
         return np.float32(x)
@@ -180,7 +185,7 @@ if __name__ == "__main__":
         nan = NAN
         a = np.array([38.004])
         b = np.array([inf])
-        print(array_same(a, b),[a==b])
+        print(array_same(a, b), [a == b])
     if 0:
         import torch
         import tensorflow

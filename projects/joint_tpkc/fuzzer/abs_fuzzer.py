@@ -2,17 +2,17 @@ import sys
 import numpy
 import traceback
 import hypothesis.strategies as st
-from hypothesis import given, settings, assume,example
+from hypothesis import given, settings, assume, example
 
 import base as TEST
 import log as LOG
-import gather as GATHER
 
 import torch
 import tensorflow
 import paddle
 
-cout = LOG.Log("abs_fuzzer",log_dir=TEST._INIT_DIR)
+cout = LOG.Log("abs_fuzzer", log_dir=TEST._INIT_DIR)
+
 
 def test_torch(_input):
     input = torch.tensor(_input)
@@ -25,40 +25,48 @@ def test_tensorflow(_input):
     output = tensorflow.math.abs(input)
     return output
 
+
 def test_paddle(_input):
     input = paddle.to_tensor(_input)
     output = paddle.abs(input)
     return output
 
+
 def assert_equals(_a, _b, _c):
     a = numpy.array(_a)
     b = numpy.array(_b)
     c = numpy.array(_c)
-    cmp = TEST.all_same([a,b,c])
-    if not cmp :
+    cmp = TEST.all_same([a, b, c])
+    if not cmp:
         cout.logHead()
         cout.log(f"a={a} b={b} c={c}")
         cout.log_empty()
         cout.logEnd()
     return cmp
 
+
 # (-inf,-1e-37]U[1e-37,inf)
-#input_float = st.one_of(
+# input_float = st.one_of(
 #    TEST.FLOATS(max_float=TEST.toFloat(-1E-37)),
 #    TEST.FLOATS(min_float=TEST.toFloat(1E-37)),
-#)
+# )
 input_float = TEST.FLOATS()
-@settings(max_examples=10000, deadline=10000)
+
+
+@settings(max_examples=1000, deadline=10000)
 @given(_input=TEST.ARRAY_ND(elements=input_float))
 def _test_abs(_input):
     if 1 and "Gather DATA":
-        GATHER.Gather_Data(cout.PROJECT_NAME,((_input)),test_torch,test_tensorflow,test_paddle)
+        import gather as GATHER
+        item = GATHER.Gather_Data(cout.PROJECT_NAME, [_input], test_torch, test_tensorflow, test_paddle)
+        print(item)
         assert True
         return
     torch_output = test_torch(_input)
     tensorflow_output = test_tensorflow(_input)
     paddle_output = test_paddle(_input)
     assertation = assert_equals(torch_output, tensorflow_output, paddle_output)
+    
     assert assertation
 
 

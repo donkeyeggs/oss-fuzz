@@ -1,0 +1,2 @@
+[1;32;49mSTD >>> [0mrunning on windows
+[1;34;49m== log out ,file saved in 20220531-04.17.32==[0m

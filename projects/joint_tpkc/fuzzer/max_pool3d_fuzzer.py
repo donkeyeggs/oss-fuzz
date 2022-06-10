@@ -109,7 +109,13 @@ def test_tensorflow(_input, _kernel_size, _stride, _padding):
 
 @settings(max_examples=100, deadline=10000)
 @given(_input=input_data())
-def test_max_pool3d(_input):
+def _test_max_pool3d(_input):
+    if 1 and "Gather DATA":
+        import gather as GATHER
+        item = GATHER.Gather_Data(cout.PROJECT_NAME,_input,test_torch,test_tensorflow,test_paddle)
+        print(item)
+        assert True
+        return
     (input, kernel_size, stride, padding) = _input
     torch_output = test_torch(input, kernel_size, stride, padding)
     tensorflow_output = test_tensorflow(input, kernel_size, stride, padding)
@@ -120,12 +126,12 @@ def test_max_pool3d(_input):
 
 TEST.log("running on", TEST.PLATFORM())
 if __name__ == "__main__" and TEST.PLATFORM() == "windows":
-    test_max_pool3d()
+    _test_max_pool3d()
     pass
 
 if __name__ == "__main__" and TEST.PLATFORM() == "linux":
     import atheris
 
-    fuzz_target = atheris.instrument_func(test_max_pool3d.hypothesis.fuzz_one_input)
+    fuzz_target = atheris.instrument_func(_test_max_pool3d.hypothesis.fuzz_one_input)
     atheris.Setup(sys.argv, fuzz_target)
     atheris.Fuzz()

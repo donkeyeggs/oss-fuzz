@@ -9,19 +9,21 @@ import hypothesis.strategies as st
 from hypothesis import given, settings, assume, example
 import log as LOG
 import warnings
+
 warnings.filterwarnings("ignore")
 
 import torch
 import tensorflow
 
-cout = LOG.Log("fft2d_fuzzer",TEST._INIT_DIR)
+cout = LOG.Log("fft2d_fuzzer", TEST._INIT_DIR)
+
 
 @st.composite
 def input_data(draw):
     input = draw(
         TEST.ARRAY_ND(
             dtype=numpy.complex,
-            shape=TEST.SHAPE(min_dims=2,max_dims=2,min_side=1,max_side=80),
+            shape=TEST.SHAPE(min_dims=2, max_dims=2, min_side=1, max_side=80),
             elements=TEST.COMPLEX()
         )
     )
@@ -43,17 +45,19 @@ def test_tensorflow(_input):
     )
     return output
 
+
 def test_paddle(_input):
     input = paddle.to_tensor(_input)
     output = paddle.fft.fft2(input)
     return output
+
 
 def assert_equals(_a, _b, _c):
     a = numpy.array(_a)
     b = numpy.array(_b)
     c = numpy.array(_c)
     # TEST.log("assert_equal ",numpy.shape(a)!=numpy.shape(b))
-    ret = TEST.all_same([a, b,c],ifcomplex=True)
+    ret = TEST.all_same([a, b, c], ifcomplex=True)
     if not ret:
         cout.logHead()
         cout.log(f"(a)={a.shape} (b)={b.shape} (c)={c.shape}")
@@ -71,9 +75,8 @@ def test_fft(_input):
     torch_output = test_torch(input)
     tensorflow_output = test_tensorflow(input)
     paddle_output = test_paddle(input)
-    assertation = assert_equals(torch_output, tensorflow_output,paddle_output)
+    assertation = assert_equals(torch_output, tensorflow_output, paddle_output)
     assert assertation
-
 
 
 torch.set_default_dtype(torch.float64)
